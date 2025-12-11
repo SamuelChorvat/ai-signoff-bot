@@ -1,3 +1,6 @@
+using AISignoffBot.Models;
+using AISignoffBot.Services;
+
 namespace AISignoffBot;
 
 public class Program
@@ -12,6 +15,14 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        
+        // Options
+        builder.Services.Configure<JiraOptions>(builder.Configuration.GetSection("Jira"));
+
+        // Services
+        builder.Services.AddHttpClient<IJiraClient, JiraClient>();
+        builder.Services.AddScoped<IJiraWebhookService, JiraWebhookService>();
+
 
         var app = builder.Build();
 
