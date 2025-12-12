@@ -1,12 +1,14 @@
 ﻿using System.Text.Json;
+using AISignoffBot.Enums;
 using AISignoffBot.Models;
+using AISignoffBot.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace AISignoffBot.Services;
 
 public class JiraWebhookService(
     ILogger<JiraWebhookService> logger,
-    IJiraClient jiraClient,
+    ISignoffWorkflow workflow,
     IOptions<JiraOptions> options) : IJiraWebhookService
 {
     private readonly JiraOptions _options = options.Value;
@@ -18,20 +20,29 @@ public class JiraWebhookService(
         using var doc = JsonDocument.Parse(payload);
         var root = doc.RootElement;
 
-        var webhookEvent = root.GetProperty("webhookEvent").GetString();
-        var issueKey = root.GetProperty("issue").GetProperty("key").GetString();
-
-        if (string.IsNullOrWhiteSpace(issueKey))
+        var trigger = TryGetTrigger(root);
+        if (trigger is null)
         {
-            logger.LogWarning("No issue key in webhook payload.");
+            logger.LogInformation("No trigger detected.");
             return;
         }
 
-        var isTrigger = false;
+        logger.LogInformation("Trigger detected: {IssueKey} via {Type}", trigger.IssueKey, trigger.Type);
+
+        await workflow.Process(trigger.IssueKey, trigger.Type, trigger.ActorAccountId);
+    }
+    
+    private JiraTrigger? TryGetTrigger(JsonElement root)
+    {
+        var webhookEvent = root.GetProperty("webhookEvent").GetString();
+        var issueKey = root.GetProperty("issue").GetProperty("key").GetString();
+
+        if (string.IsNullOrWhiteSpace(issueKey)) return null;
+        
+        var actor = TryGetActorAccountId(root);
 
         // Status change → AI Signoff
-        if (webhookEvent == "jira:issue_updated" &&
-            root.TryGetProperty("changelog", out var changelog))
+        if (webhookEvent == "jira:issue_updated" && root.TryGetProperty("changelog", out var changelog))
         {
             foreach (var item in changelog.GetProperty("items").EnumerateArray())
             {
@@ -40,42 +51,39 @@ public class JiraWebhookService(
                     var fromStatus = item.GetProperty("fromString").GetString();
                     var toStatus = item.GetProperty("toString").GetString();
 
-                    // trigger ONLY when actually moved into AI Signoff
-                    if (!string.Equals(fromStatus, toStatus, StringComparison.OrdinalIgnoreCase) &&
-                        string.Equals(toStatus, _options.AiStatusName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        isTrigger = true;
-                        break;
-                    }
+                    if (string.Equals(fromStatus, toStatus, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    if (string.Equals(toStatus, _options.AiStatusName, StringComparison.OrdinalIgnoreCase))
+                        return new JiraTrigger(issueKey, JiraTriggerType.StatusChangeToAi, actor);
+
+                    if (string.Equals(toStatus, _options.QaStatusName, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(fromStatus, _options.AiStatusName, StringComparison.OrdinalIgnoreCase))
+                        return new JiraTrigger(issueKey, JiraTriggerType.StatusChangeToQa, actor);
                 }
             }
         }
 
-
         // Comment with trigger tag
-        if (!isTrigger &&
-            webhookEvent == "comment_created" &&
-            root.TryGetProperty("comment", out var comment))
+        if (webhookEvent == "comment_created" && root.TryGetProperty("comment", out var comment))
         {
             var bodyText = comment.GetProperty("body").GetString() ?? string.Empty;
-
             if (bodyText.Contains(_options.TriggerTag, StringComparison.OrdinalIgnoreCase))
             {
-                isTrigger = true;
+                return new JiraTrigger(issueKey, JiraTriggerType.CommentTag);
             }
         }
 
-        if (!isTrigger)
-        {
-            logger.LogInformation("No AI trigger detected for issue {IssueKey}", issueKey);
-            return;
-        }
-
-        logger.LogInformation("AI trigger detected for issue {IssueKey}", issueKey);
-
-        // V0 behaviour: just add a dummy comment
-        await jiraClient.AddComment(
-            issueKey,
-            "[AI BOT] Placeholder: AI sign-off trigger received. (V0 dummy response)");
+        return null;
     }
+    
+    private static string? TryGetActorAccountId(JsonElement root)
+    {
+        if (root.TryGetProperty("user", out var user) &&
+            user.TryGetProperty("accountId", out var acc))
+            return acc.GetString();
+
+        return null;
+    }
+
 }

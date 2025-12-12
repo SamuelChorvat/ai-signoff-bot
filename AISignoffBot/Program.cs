@@ -1,5 +1,7 @@
 using AISignoffBot.Models;
 using AISignoffBot.Services;
+using AISignoffBot.Services.Interfaces;
+using AISignoffBot.Services.V1;
 
 namespace AISignoffBot;
 
@@ -20,9 +22,14 @@ public class Program
         builder.Services.Configure<JiraOptions>(builder.Configuration.GetSection("Jira"));
 
         // Services
-        builder.Services.AddHttpClient<IJiraClient, JiraClient>();
         builder.Services.AddScoped<IJiraWebhookService, JiraWebhookService>();
+        builder.Services.AddScoped<ISignoffWorkflow, SignoffWorkflow>();
 
+        builder.Services.AddHttpClient<IJiraClient, JiraClient>();
+        
+        builder.Services.AddScoped<IAcProvider, SimpleAcProvider>();
+        builder.Services.AddScoped<ISignoffEvaluator, RandomSignoffEvaluator>();
+        builder.Services.AddScoped<ISignoffReporter, MarkdownSignoffReporter>();
 
         var app = builder.Build();
 

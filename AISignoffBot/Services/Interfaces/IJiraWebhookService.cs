@@ -1,4 +1,4 @@
-﻿namespace AISignoffBot.Services;
+﻿namespace AISignoffBot.Services.Interfaces;
 
 public interface IJiraWebhookService
 {
