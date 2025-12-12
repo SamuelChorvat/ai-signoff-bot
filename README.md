@@ -1,6 +1,3 @@
-# ai-signoff-bot
-
-
 # AI Signoff Bot 🤖
 
 [Jira link](https://acbot.atlassian.net?continue=https%3A%2F%2Facbot.atlassian.net%2Fwelcome%2Fsoftware&atlOrigin=eyJpIjoiYzZjMjZmZjM0MGU4NGI5Mzg5ZjExMDNmOTZkMzBhZmMiLCJwIjoiaiJ9) for demo board
@@ -58,19 +55,6 @@ V1 focuses on establishing robust Jira integration and a realistic signoff workf
 - Prevents duplicate processing via labels
 - Avoids trigger loops from bot comments or unrelated updates
 - All Jira operations are logged and fault-tolerant
-
----
-
-## V2 – AI-Driven Evidence Analysis (Planned)
-
-V2 will replace the stub evaluator with real AI analysis.
-
-Planned enhancements:
-- Analyse test evidence (initially screenshots, extensible to video)
-- Map evidence to Acceptance Criteria
-- Provide confidence-based reasoning and explanations
-- Highlight missing AC coverage and edge cases
-- Optional comparison of UI behaviour against Figma designs
 
 ---
 
