@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -8,7 +7,7 @@ using AISignoffBot.Models;
 using AISignoffBot.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
-namespace AISignoffBot.Services.V2;
+namespace AISignoffBot.Services;
 
 public class VisionAiEvidenceAnalyzer(
     ILogger<VisionAiEvidenceAnalyzer> logger,
@@ -16,7 +15,7 @@ public class VisionAiEvidenceAnalyzer(
     IOptions<AiOptions> aiOptions)
     : IAiEvidenceAnalyzer
 {
-    private readonly AiOptions options = aiOptions.Value;
+    private readonly AiOptions _options = aiOptions.Value;
 
     public async Task<SignoffResult> AnalyzeAsync(
         IReadOnlyList<string> acceptanceCriteria,
@@ -31,7 +30,7 @@ public class VisionAiEvidenceAnalyzer(
         var systemPrompt = BuildSystemPrompt();
         var userPrompt = BuildUserPrompt(acceptanceCriteria, evidenceImages);
 
-        logger.LogInformation("Running vision analysis with model {Model}", options.Model);
+        logger.LogInformation("Running vision analysis with model {Model}", _options.Model);
 
         try
         {
@@ -216,7 +215,7 @@ public class VisionAiEvidenceAnalyzer(
         public bool? Passed { get; set; }
 
         [JsonPropertyName("criteria")]
-        public List<AiCriterion> Criteria { get; set; } = new();
+        public List<AiCriterion> Criteria { get; set; } = [];
     }
 
     private class AiCriterion

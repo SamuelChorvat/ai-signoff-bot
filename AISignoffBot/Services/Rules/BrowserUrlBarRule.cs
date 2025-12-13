@@ -1,5 +1,3 @@
-using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -16,7 +14,7 @@ public class BrowserUrlBarRule(
     {
         if (evidenceImages.Count == 0)
         {
-            return new RuleResult(Array.Empty<RuleFailure>());
+            return new RuleResult([]);
         }
 
         try
@@ -31,18 +29,18 @@ public class BrowserUrlBarRule(
             var failures = EvaluateFindings(parsed);
 
             return failures.Count == 0
-                ? new RuleResult(Array.Empty<RuleFailure>())
+                ? new RuleResult([])
                 : new RuleResult([new RuleFailure(BuildFailureMessage(), failures)]);
         }
         catch (JsonException ex)
         {
             logger.LogWarning(ex, "Browser URL bar rule: AI returned invalid JSON");
-            return new RuleResult(Array.Empty<RuleFailure>());
+            return new RuleResult([]);
         }
         catch (HttpRequestException ex)
         {
             logger.LogError(ex, "Browser URL bar rule: AI request failed");
-            return new RuleResult(Array.Empty<RuleFailure>());
+            return new RuleResult([]);
         }
     }
 
@@ -118,7 +116,7 @@ public class BrowserUrlBarRule(
     private class BrowserUiResponse
     {
         [JsonPropertyName("screens")]
-        public List<BrowserUiFinding> Screens { get; set; } = new();
+        public List<BrowserUiFinding> Screens { get; set; } = [];
     }
 
     private class BrowserUiFinding

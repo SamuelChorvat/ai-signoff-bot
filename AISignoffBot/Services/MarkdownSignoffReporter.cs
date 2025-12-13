@@ -1,10 +1,9 @@
-using System.Linq;
 using System.Text;
 using AISignoffBot.Enums;
 using AISignoffBot.Models;
 using AISignoffBot.Services.Interfaces;
 
-namespace AISignoffBot.Services.V1;
+namespace AISignoffBot.Services;
 
 public class MarkdownSignoffReporter : ISignoffReporter
 {

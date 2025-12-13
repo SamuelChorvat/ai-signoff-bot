@@ -71,7 +71,7 @@ public class SignoffWorkflow(
             var evidenceComment = reporter.FormatEvidenceComment(evidenceImages);
             await jira.AddComment(issueKey, evidenceComment, ct);
 
-            // 5) Evaluate (stub for V1)
+            // 5) Evaluate
             var result = await aiEvidenceAnalyzer.AnalyzeAsync(acs, evidenceImages, ct);
 
             var ruleResult = await EvaluateRulesAsync(evidenceImages, ct);
@@ -118,7 +118,7 @@ public class SignoffWorkflow(
     {
         if (!rules.Any())
         {
-            return new RuleResult(Array.Empty<RuleFailure>());
+            return new RuleResult([]);
         }
 
         var failures = new List<RuleFailure>();

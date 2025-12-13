@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -10,8 +9,8 @@ namespace AISignoffBot.Services;
 
 public class OpenAiClient : IAiClient
 {
-    private readonly HttpClient httpClient;
-    private readonly AiOptions options;
+    private readonly HttpClient _httpClient;
+    private readonly AiOptions _options;
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
@@ -19,12 +18,12 @@ public class OpenAiClient : IAiClient
 
     public OpenAiClient(HttpClient httpClient, IOptions<AiOptions> aiOptions)
     {
-        this.httpClient = httpClient;
-        options = aiOptions.Value;
+        this._httpClient = httpClient;
+        _options = aiOptions.Value;
 
-        if (string.IsNullOrWhiteSpace(this.httpClient.BaseAddress?.ToString()))
+        if (string.IsNullOrWhiteSpace(this._httpClient.BaseAddress?.ToString()))
         {
-            this.httpClient.BaseAddress = new Uri("https://api.openai.com/");
+            this._httpClient.BaseAddress = new Uri("https://api.openai.com/");
         }
     }
 
@@ -34,22 +33,22 @@ public class OpenAiClient : IAiClient
         IReadOnlyList<EvidenceImage> evidenceImages,
         CancellationToken ct = default)
     {
-        if (string.IsNullOrWhiteSpace(options.ApiKey))
+        if (string.IsNullOrWhiteSpace(_options.ApiKey))
         {
             throw new InvalidOperationException("AI ApiKey is not configured.");
         }
 
-        if (!string.Equals(options.Provider, "OpenAI", StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(_options.Provider, "OpenAI", StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidOperationException($"Unsupported AI provider: {options.Provider}");
+            throw new InvalidOperationException($"Unsupported AI provider: {_options.Provider}");
         }
 
         using var request = new HttpRequestMessage(HttpMethod.Post, "v1/chat/completions");
-        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", options.ApiKey);
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _options.ApiKey);
 
         var payload = new OpenAiChatRequest
         {
-            Model = options.Model,
+            Model = _options.Model,
             Messages =
             [
                 new OpenAiMessage
@@ -68,7 +67,7 @@ public class OpenAiClient : IAiClient
 
         request.Content = new StringContent(JsonSerializer.Serialize(payload, JsonOptions), Encoding.UTF8, "application/json");
 
-        using var response = await httpClient.SendAsync(request, ct);
+        using var response = await _httpClient.SendAsync(request, ct);
         var responseText = await response.Content.ReadAsStringAsync(ct);
 
         if (!response.IsSuccessStatusCode)
@@ -126,7 +125,7 @@ public class OpenAiClient : IAiClient
         public string Model { get; set; } = string.Empty;
 
         [JsonPropertyName("messages")]
-        public List<OpenAiMessage> Messages { get; set; } = new();
+        public List<OpenAiMessage> Messages { get; set; } = [];
 
         [JsonPropertyName("response_format")]
         public OpenAiResponseFormat ResponseFormat { get; set; } = new();
@@ -144,7 +143,7 @@ public class OpenAiClient : IAiClient
         public string Role { get; set; } = string.Empty;
 
         [JsonPropertyName("content")]
-        public List<OpenAiMessageContent> Content { get; set; } = new();
+        public List<OpenAiMessageContent> Content { get; set; } = [];
     }
 
     private class OpenAiMessageContent
