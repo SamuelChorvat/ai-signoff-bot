@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -38,7 +40,7 @@ public class VisionAiEvidenceAnalyzer(
 
             if (parsed == null)
             {
-                return BuildInvalidResult(acceptanceCriteria, "AI output invalid");
+                return BuildFailureResult(acceptanceCriteria, "AI output invalid");
             }
 
             var results = BuildResults(acceptanceCriteria, parsed);
@@ -49,12 +51,26 @@ public class VisionAiEvidenceAnalyzer(
         catch (JsonException ex)
         {
             logger.LogWarning(ex, "AI returned invalid JSON");
-            return BuildInvalidResult(acceptanceCriteria, "AI output invalid");
+            return BuildFailureResult(acceptanceCriteria, "AI output invalid");
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "AI request failed");
+
+            var note = ex.StatusCode switch
+            {
+                HttpStatusCode.TooManyRequests => "AI request rate limited",
+                HttpStatusCode.BadRequest => "AI request rejected",
+                _ when ex.StatusCode.HasValue => $"AI request failed ({(int)ex.StatusCode} {ex.StatusCode})",
+                _ => "AI request failed"
+            };
+
+            return BuildFailureResult(acceptanceCriteria, note);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "AI analysis failed");
-            return BuildInvalidResult(acceptanceCriteria, "AI output invalid");
+            return BuildFailureResult(acceptanceCriteria, "AI analysis failed");
         }
     }
 
@@ -150,10 +166,10 @@ public class VisionAiEvidenceAnalyzer(
         return results;
     }
 
-    private static SignoffResult BuildInvalidResult(IReadOnlyList<string> acceptanceCriteria, string note)
+    private static SignoffResult BuildFailureResult(IReadOnlyList<string> acceptanceCriteria, string note)
     {
         var fallback = acceptanceCriteria
-            .Select(ac => new AcResult(ac, AcStatus.NoEvidence, note))
+            .Select(ac => new AcResult(ac, AcStatus.NotMet, note))
             .ToList();
 
         return new SignoffResult(false, fallback);
