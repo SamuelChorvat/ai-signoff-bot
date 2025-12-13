@@ -12,6 +12,10 @@ public class OpenAiClient : IAiClient
 {
     private readonly HttpClient httpClient;
     private readonly AiOptions options;
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
 
     public OpenAiClient(HttpClient httpClient, IOptions<AiOptions> aiOptions)
     {
@@ -62,7 +66,7 @@ public class OpenAiClient : IAiClient
             ResponseFormat = new() { Type = "json_object" }
         };
 
-        request.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+        request.Content = new StringContent(JsonSerializer.Serialize(payload, JsonOptions), Encoding.UTF8, "application/json");
 
         using var response = await httpClient.SendAsync(request, ct);
         var responseText = await response.Content.ReadAsStringAsync(ct);
@@ -81,7 +85,7 @@ public class OpenAiClient : IAiClient
             throw new HttpRequestException(message, null, response.StatusCode);
         }
 
-        var result = JsonSerializer.Deserialize<OpenAiChatResponse>(responseText);
+        var result = JsonSerializer.Deserialize<OpenAiChatResponse>(responseText, JsonOptions);
         var content = result?.Choices?.FirstOrDefault()?.Message?.Content;
 
         if (string.IsNullOrWhiteSpace(content))
@@ -149,9 +153,11 @@ public class OpenAiClient : IAiClient
         public string Type { get; set; } = "text";
 
         [JsonPropertyName("text")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Text { get; set; }
 
         [JsonPropertyName("image_url")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public OpenAiImageUrl? ImageUrl { get; set; }
     }
 
