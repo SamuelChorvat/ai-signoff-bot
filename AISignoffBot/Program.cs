@@ -21,6 +21,7 @@ public class Program
         
         // Options
         builder.Services.Configure<JiraOptions>(builder.Configuration.GetSection("Jira"));
+        builder.Services.Configure<AiOptions>(builder.Configuration.GetSection("Ai"));
 
         // Services
         builder.Services.AddScoped<IJiraWebhookService, JiraWebhookService>();
@@ -30,7 +31,8 @@ public class Program
         builder.Services.AddHttpClient<IJiraClient, JiraClient>();
 
         builder.Services.AddScoped<IAcProvider, SimpleAcProvider>();
-        builder.Services.AddScoped<IAiEvidenceAnalyzer, FakeAiEvidenceAnalyzer>();
+        builder.Services.AddScoped<IAiEvidenceAnalyzer, VisionAiEvidenceAnalyzer>();
+        builder.Services.AddHttpClient<IAiClient, OpenAiClient>();
         builder.Services.AddScoped<ISignoffReporter, MarkdownSignoffReporter>();
 
         var app = builder.Build();
