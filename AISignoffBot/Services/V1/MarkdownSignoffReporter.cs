@@ -102,7 +102,7 @@ public class MarkdownSignoffReporter : ISignoffReporter
     {
         return string.IsNullOrWhiteSpace(url)
             ? filename
-            : $"[{filename}]({url})";
+            : $"[{filename}|{url}]";
     }
 
     private static string FormatKilobytes(int byteCount)
