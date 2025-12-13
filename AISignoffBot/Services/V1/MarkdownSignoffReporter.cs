@@ -11,7 +11,7 @@ public class MarkdownSignoffReporter : ISignoffReporter
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine("[AI BOT] AC Signoff (V1 Stub)");
+        sb.AppendLine("[AI BOT] AC Signoff (Vision AI)");
         sb.AppendLine($"Issue: {issue.Key} - {issue.Summary}");
         sb.AppendLine($"Result: {(result.Passed ? "PASS ✅" : "FAIL ❌")}");
         sb.AppendLine();
@@ -34,9 +34,6 @@ public class MarkdownSignoffReporter : ISignoffReporter
 
             sb.AppendLine($"- {icon} {r.Criterion} — {r.Status} ({r.Notes})");
         }
-
-        sb.AppendLine();
-        sb.AppendLine("Note: V1 uses a stub evaluator (randomised). AI analysis will replace this.");
 
         return sb.ToString();
     }
