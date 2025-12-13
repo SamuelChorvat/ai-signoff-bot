@@ -8,7 +8,10 @@ public class RandomSignoffEvaluator : ISignoffEvaluator
 {
     private readonly Random _rng = new();
 
-    public Task<SignoffResult> EvaluateAsync(IReadOnlyList<string> acceptanceCriteria, CancellationToken ct = default)
+    public Task<SignoffResult> EvaluateAsync(
+        IReadOnlyList<string> acceptanceCriteria,
+        IReadOnlyList<JiraAttachmentEvidence> evidence,
+        CancellationToken ct = default)
     {
         var passed = _rng.NextDouble() >= 0.5;
 

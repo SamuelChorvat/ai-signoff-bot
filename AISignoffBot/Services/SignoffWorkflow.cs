@@ -15,6 +15,7 @@ public class SignoffWorkflow(
     private const string LabelSignedOff = "ai_signed_off";
     private const string LabelNeedsHuman = "needs_human_review";
     private const string LabelAddressing = "addressing_ai_feedback";
+    private const int EvidenceAttachmentLimit = 3;
     
     private static readonly string[] AiLabels =
     [
@@ -57,17 +58,20 @@ public class SignoffWorkflow(
         // 3) Extract ACs
         var acs = acProvider.ExtractAcceptanceCriteria(issue.Description);
 
-        // 4) Evaluate (stub for V1)
-        var result = await evaluator.EvaluateAsync(acs, ct);
+        // 4) Gather attachments as potential evidence for evaluator
+        var evidence = await jira.GetIssueEvidenceAsync(issueKey, EvidenceAttachmentLimit, ct);
 
-        // 5) Comment
+        // 5) Evaluate (stub for V1)
+        var result = await evaluator.EvaluateAsync(acs, evidence, ct);
+
+        // 6) Comment
         var comment = reporter.FormatComment(issue, acs, result);
         await jira.AddComment(issueKey, comment, ct);
 
-        // 6) Mark processed (prevents loops)
+        // 7) Mark processed (prevents loops)
         await jira.AddLabels(issueKey, [LabelProcessed], ct);
 
-        // 7) Outcome actions
+        // 8) Outcome actions
         if (result.Passed)
         {
             await jira.AddLabels(issueKey, [LabelSignedOff], ct);
