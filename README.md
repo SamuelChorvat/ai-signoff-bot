@@ -9,6 +9,28 @@ This repository evolves in clear iterations. Each version builds on the previous
 
 ---
 
+## V2 – Evidence-aware Vision AI Signoff
+
+**Status:** ✅ Implemented
+
+V2 brings the AI experience to life by pulling real Jira evidence and sending it to a vision model.
+
+### What V2 adds
+
+- **Jira evidence ingestion**
+  - Collects the most recent PNG/JPEG/WEBP attachments (capped by configuration) and downloads the bytes for analysis.
+  - Posts an evidence summary comment listing which files were pulled into the run.
+
+- **Vision-based AC evaluation**
+  - Sends acceptance criteria plus the gathered images to an AI vision model and maps its JSON response back to the AC list.
+  - Falls back to explicit "NotMet"/"NoEvidence" notes when the AI response is invalid or missing fields.
+  - Includes a fake analyzer option for demos that marks only the first criterion as met.
+
+- **Configurable AI settings**
+  - Supports provider/model/API key configuration (defaults to OpenAI gpt-4o) via `appsettings.json`.
+
+---
+
 ## V1 – Jira-native AI Signoff (Plumbing & Workflow)
 
 **Status:** ✅ Implemented
