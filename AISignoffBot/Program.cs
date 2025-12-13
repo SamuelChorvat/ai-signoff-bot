@@ -27,9 +27,9 @@ public class Program
         builder.Services.AddScoped<IEvidenceProvider, JiraEvidenceProvider>();
 
         builder.Services.AddHttpClient<IJiraClient, JiraClient>();
-        
+
         builder.Services.AddScoped<IAcProvider, SimpleAcProvider>();
-        builder.Services.AddScoped<ISignoffEvaluator, RandomSignoffEvaluator>();
+        builder.Services.AddScoped<IAiEvidenceAnalyzer, FakeAiEvidenceAnalyzer>();
         builder.Services.AddScoped<ISignoffReporter, MarkdownSignoffReporter>();
 
         var app = builder.Build();
