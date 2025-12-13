@@ -111,8 +111,7 @@ public class LocalUrlEvidenceRule(
 
     private static string BuildFailureMessage(IEnumerable<string> filenames)
     {
-        var joined = string.Join(", ", filenames);
-        return $"Evidence shows a local/private URL (e.g., localhost). Provide screenshots from a shared environment. Offending images: {joined}";
+        return "Evidence shows a local/private URL (e.g., localhost). Provide screenshots from a shared environment.";
     }
 
     private static bool IsLocalUrl(string url)
