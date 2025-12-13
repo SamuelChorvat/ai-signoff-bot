@@ -73,7 +73,7 @@ public class SignoffWorkflow(
             var result = await aiEvidenceAnalyzer.AnalyzeAsync(acs, evidenceImages, ct);
 
             // 6) Comment
-            var comment = reporter.FormatComment(issue, acs, result);
+            var comment = reporter.FormatComment(issue, acs, evidenceImages, result);
             await jira.AddComment(issueKey, comment, ct);
 
             // 7) Mark processed (prevents loops)

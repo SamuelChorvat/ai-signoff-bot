@@ -24,7 +24,8 @@ public class RandomSignoffEvaluator : ISignoffEvaluator
             results.Add(new AcResult(
                 acceptanceCriteria[i],
                 status,
-                passed ? "Stub pass" : "Stub fail / missing evidence"));
+                passed ? "Stub pass" : "Stub fail / missing evidence",
+                Array.Empty<string>()));
         }
 
         return Task.FromResult(new SignoffResult(passed, results));

@@ -144,7 +144,11 @@ public class VisionAiEvidenceAnalyzer(
 
             if (match == null)
             {
-                results.Add(new AcResult(acceptanceCriteria[i], AcStatus.NoEvidence, "AI did not return a result for this criterion."));
+                results.Add(new AcResult(
+                    acceptanceCriteria[i],
+                    AcStatus.NoEvidence,
+                    "AI did not return a result for this criterion.",
+                    []));
                 continue;
             }
 
@@ -159,12 +163,12 @@ public class VisionAiEvidenceAnalyzer(
                 ? "No explanation provided."
                 : match.Notes.Trim();
 
-            if (match.Evidence?.Count > 0)
-            {
-                notes = $"{notes} Evidence: {string.Join(", ", match.Evidence)}";
-            }
+            var evidence = match.Evidence?.Where(e => !string.IsNullOrWhiteSpace(e))
+                .Select(e => e.Trim())
+                .ToList()
+                ?? [];
 
-            results.Add(new AcResult(acceptanceCriteria[i], status, notes));
+            results.Add(new AcResult(acceptanceCriteria[i], status, notes, evidence));
         }
 
         return results;
@@ -173,7 +177,7 @@ public class VisionAiEvidenceAnalyzer(
     private static SignoffResult BuildFailureResult(IReadOnlyList<string> acceptanceCriteria, string note)
     {
         var fallback = acceptanceCriteria
-            .Select(ac => new AcResult(ac, AcStatus.NotMet, note))
+            .Select(ac => new AcResult(ac, AcStatus.NotMet, note, []))
             .ToList();
 
         return new SignoffResult(false, fallback);
