@@ -1,4 +1,5 @@
 ﻿using AISignoffBot.Enums;
+using AISignoffBot.Models;
 using AISignoffBot.Services.Interfaces;
 
 namespace AISignoffBot.Services;
@@ -9,6 +10,7 @@ public class SignoffWorkflow(
     IAcProvider acProvider,
     IEvidenceProvider evidenceProvider,
     IAiEvidenceAnalyzer aiEvidenceAnalyzer,
+    IEnumerable<ISignoffRule> rules,
     ISignoffReporter reporter)
     : ISignoffWorkflow
 {
@@ -72,15 +74,18 @@ public class SignoffWorkflow(
             // 5) Evaluate (stub for V1)
             var result = await aiEvidenceAnalyzer.AnalyzeAsync(acs, evidenceImages, ct);
 
+            var ruleResult = await EvaluateRulesAsync(evidenceImages, ct);
+            var overallPassed = result.Passed && ruleResult.Passed;
+
             // 6) Comment
-            var comment = reporter.FormatComment(issue, acs, result);
+            var comment = reporter.FormatComment(issue, acs, evidenceImages, result, ruleResult);
             await jira.AddComment(issueKey, comment, ct);
 
             // 7) Mark processed (prevents loops)
             await jira.AddLabels(issueKey, [LabelProcessed], ct);
 
             // 8) Outcome actions
-            if (result.Passed)
+            if (overallPassed)
             {
                 await jira.AddLabels(issueKey, [LabelSignedOff], ct);
 
@@ -97,12 +102,38 @@ public class SignoffWorkflow(
                 // await _jira.TransitionToStatus(issueKey, "In Progress", ct);
             }
 
-            logger.LogInformation("Completed signoff for {IssueKey} (Passed: {Passed})", issueKey, result.Passed);
+            logger.LogInformation(
+                "Completed signoff for {IssueKey} (AC Passed: {AcPassed}, Rules Passed: {RulesPassed})",
+                issueKey,
+                result.Passed,
+                ruleResult.Passed);
         }
         finally
         {
             await RemoveProcessingLabel(issueKey, ct);
         }
+    }
+
+    private async Task<RuleResult> EvaluateRulesAsync(IReadOnlyList<EvidenceImage> evidenceImages, CancellationToken ct)
+    {
+        if (!rules.Any())
+        {
+            return new RuleResult(Array.Empty<RuleFailure>());
+        }
+
+        var failures = new List<RuleFailure>();
+
+        foreach (var rule in rules)
+        {
+            var result = await rule.EvaluateAsync(evidenceImages, ct);
+
+            if (result.Failures.Count > 0)
+            {
+                failures.AddRange(result.Failures);
+            }
+        }
+
+        return new RuleResult(failures);
     }
 
     private async Task ResetForQaAsync(string issueKey, CancellationToken ct)

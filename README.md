@@ -8,6 +8,24 @@ The project moves in clear versions. Each one adds a slice of capability.
 
 ---
 
+## V3 – Evidence quality guardrails & richer reporting
+
+**Status:** ✅ Implemented
+
+V3 hardens signoff confidence by validating the provenance of screenshots and surfacing richer evidence in Jira.
+
+### What V3 adds
+
+- **Evidence quality rules (pre-flight checks)**
+  - Introduces a rule engine that runs alongside AC evaluation; any failure blocks signoff even if ACs pass.
+  - Flags screenshots with local or private URLs (e.g., localhost, private IP ranges) to require shared-environment proof. 
+  - Flags browser-like screenshots that hide the URL bar, preventing signoff when the environment cannot be verified.
+- **Linked evidence in Jira comments**
+  - Evidence lists and per-AC notes now hyperlink attachments directly in Jira for faster review.
+  - Evidence entries retain their generated keys for consistent logging and traceability.
+
+---
+
 ## V2 – Evidence-aware Vision AI Signoff
 
 **Status:** ✅ Implemented
