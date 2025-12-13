@@ -8,7 +8,7 @@ public class SignoffWorkflow(
     IJiraClient jira,
     IAcProvider acProvider,
     IEvidenceProvider evidenceProvider,
-    ISignoffEvaluator evaluator,
+    IAiEvidenceAnalyzer aiEvidenceAnalyzer,
     ISignoffReporter reporter)
     : ISignoffWorkflow
 {
@@ -64,7 +64,7 @@ public class SignoffWorkflow(
         await jira.AddComment(issueKey, evidenceComment, ct);
 
         // 5) Evaluate (stub for V1)
-        var result = await evaluator.EvaluateAsync(acs, ct);
+        var result = await aiEvidenceAnalyzer.AnalyzeAsync(acs, evidenceImages, ct);
 
         // 6) Comment
         var comment = reporter.FormatComment(issue, acs, result);
