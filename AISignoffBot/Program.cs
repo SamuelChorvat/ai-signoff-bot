@@ -2,6 +2,7 @@ using AISignoffBot.Models;
 using AISignoffBot.Services;
 using AISignoffBot.Services.Interfaces;
 using AISignoffBot.Services.V1;
+using AISignoffBot.Services.V2;
 
 namespace AISignoffBot;
 

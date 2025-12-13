@@ -2,7 +2,7 @@ using AISignoffBot.Enums;
 using AISignoffBot.Models;
 using AISignoffBot.Services.Interfaces;
 
-namespace AISignoffBot.Services.V1;
+namespace AISignoffBot.Services.V2;
 
 public class FakeAiEvidenceAnalyzer : IAiEvidenceAnalyzer
 {
