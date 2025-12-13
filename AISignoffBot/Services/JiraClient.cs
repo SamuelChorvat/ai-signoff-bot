@@ -47,7 +47,7 @@ public class JiraClient : IJiraClient
     public async Task<JiraIssue> GetIssue(string issueKey, CancellationToken ct = default)
     {
         // Use v2; request only what we need
-        var url = $"{_options.BaseUrl}/rest/api/2/issue/{issueKey}?fields=summary,description,labels";
+        var url = $"{_options.BaseUrl}/rest/api/2/issue/{issueKey}?fields=summary,description,labels,attachment";
 
         _logger.LogInformation("Fetching Jira issue {IssueKey} from {Url}", issueKey, url);
 
@@ -80,7 +80,22 @@ public class JiraClient : IJiraClient
             }
         }
 
-        return new JiraIssue(key, summary, description, labels);
+        var attachments = new List<JiraAttachment>();
+        if (fields.TryGetProperty("attachment", out var attachmentsEl) && attachmentsEl.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var attachmentEl in attachmentsEl.EnumerateArray())
+            {
+                var filename = attachmentEl.TryGetProperty("filename", out var fn) ? (fn.GetString() ?? string.Empty) : string.Empty;
+                var mimeType = attachmentEl.TryGetProperty("mimeType", out var mt) ? (mt.GetString() ?? string.Empty) : string.Empty;
+                var contentUrl = attachmentEl.TryGetProperty("content", out var content) ? (content.GetString() ?? string.Empty) : string.Empty;
+
+                attachments.Add(new JiraAttachment(filename, mimeType, contentUrl));
+            }
+        }
+
+        _logger.LogInformation("Retrieved {AttachmentCount} attachments for {IssueKey}", attachments.Count, key);
+
+        return new JiraIssue(key, summary, description, labels, attachments);
     }
 
     public async Task AddComment(string issueKey, string comment, CancellationToken ct = default)
