@@ -88,8 +88,12 @@ public class JiraClient : IJiraClient
                 var filename = attachmentEl.TryGetProperty("filename", out var fn) ? (fn.GetString() ?? string.Empty) : string.Empty;
                 var mimeType = attachmentEl.TryGetProperty("mimeType", out var mt) ? (mt.GetString() ?? string.Empty) : string.Empty;
                 var contentUrl = attachmentEl.TryGetProperty("content", out var contentProperty) ? (contentProperty.GetString() ?? string.Empty) : string.Empty;
+                var created = attachmentEl.TryGetProperty("created", out var createdEl)
+                    && DateTimeOffset.TryParse(createdEl.GetString(), out var createdDto)
+                        ? createdDto
+                        : DateTimeOffset.MinValue;
 
-                attachments.Add(new JiraAttachment(filename, mimeType, contentUrl));
+                attachments.Add(new JiraAttachment(filename, mimeType, contentUrl, created));
             }
         }
 
@@ -258,6 +262,30 @@ public class JiraClient : IJiraClient
                 response.StatusCode, issueKey, body);
             throw new HttpRequestException($"SetFlagged failed {response.StatusCode}: {body}");
         }
+    }
+
+    public async Task<byte[]> DownloadAttachmentAsync(string contentUrl, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(contentUrl))
+        {
+            throw new ArgumentException("Content URL is required", nameof(contentUrl));
+        }
+
+        _logger.LogInformation("Downloading attachment from {ContentUrl}", contentUrl);
+
+        var response = await _httpClient.GetAsync(contentUrl, ct);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(ct);
+            _logger.LogError("DownloadAttachmentAsync failed {StatusCode} for {ContentUrl}. Body: {Body}",
+                response.StatusCode, contentUrl, body);
+            throw new HttpRequestException($"DownloadAttachmentAsync failed {response.StatusCode}: {body}");
+        }
+
+        var bytes = await response.Content.ReadAsByteArrayAsync(ct);
+
+        return bytes;
     }
     
     public async Task SetLabels(string issueKey, IEnumerable<string> labels, CancellationToken ct = default)

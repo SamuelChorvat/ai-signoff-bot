@@ -7,6 +7,7 @@ public class SignoffWorkflow(
     ILogger<SignoffWorkflow> logger,
     IJiraClient jira,
     IAcProvider acProvider,
+    IEvidenceProvider evidenceProvider,
     ISignoffEvaluator evaluator,
     ISignoffReporter reporter)
     : ISignoffWorkflow
@@ -57,17 +58,22 @@ public class SignoffWorkflow(
         // 3) Extract ACs
         var acs = acProvider.ExtractAcceptanceCriteria(issue.Description);
 
-        // 4) Evaluate (stub for V1)
+        // 4) Gather evidence
+        var evidenceImages = await evidenceProvider.GetLatestImagesAsync(issueKey, ct);
+        var evidenceComment = reporter.FormatEvidenceComment(evidenceImages);
+        await jira.AddComment(issueKey, evidenceComment, ct);
+
+        // 5) Evaluate (stub for V1)
         var result = await evaluator.EvaluateAsync(acs, ct);
 
-        // 5) Comment
+        // 6) Comment
         var comment = reporter.FormatComment(issue, acs, result);
         await jira.AddComment(issueKey, comment, ct);
 
-        // 6) Mark processed (prevents loops)
+        // 7) Mark processed (prevents loops)
         await jira.AddLabels(issueKey, [LabelProcessed], ct);
 
-        // 7) Outcome actions
+        // 8) Outcome actions
         if (result.Passed)
         {
             await jira.AddLabels(issueKey, [LabelSignedOff], ct);
@@ -87,7 +93,7 @@ public class SignoffWorkflow(
 
         logger.LogInformation("Completed signoff for {IssueKey} (Passed: {Passed})", issueKey, result.Passed);
     }
-    
+
     private async Task ResetForQaAsync(string issueKey, CancellationToken ct)
     {
         logger.LogInformation("Resetting AI state for {IssueKey} (moved to QA)", issueKey);
