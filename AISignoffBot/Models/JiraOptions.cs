@@ -8,4 +8,5 @@ public class JiraOptions
     public string AiStatusName { get; set; } = "AI Signoff";
     public string QaStatusName { get; set; } = "QA";
     public string TriggerTag { get; set; } = "@ai";
+    public int MaxEvidenceImages { get; set; } = 3;
 }

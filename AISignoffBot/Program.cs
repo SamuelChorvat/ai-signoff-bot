@@ -24,6 +24,7 @@ public class Program
         // Services
         builder.Services.AddScoped<IJiraWebhookService, JiraWebhookService>();
         builder.Services.AddScoped<ISignoffWorkflow, SignoffWorkflow>();
+        builder.Services.AddScoped<IEvidenceProvider, JiraEvidenceProvider>();
 
         builder.Services.AddHttpClient<IJiraClient, JiraClient>();
         
