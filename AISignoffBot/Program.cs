@@ -1,6 +1,7 @@
 using AISignoffBot.Models;
 using AISignoffBot.Services;
 using AISignoffBot.Services.Interfaces;
+using AISignoffBot.Services.Rules;
 using AISignoffBot.Services.V1;
 using AISignoffBot.Services.V2;
 
@@ -34,6 +35,7 @@ public class Program
         builder.Services.AddScoped<IAiEvidenceAnalyzer, VisionAiEvidenceAnalyzer>();
         builder.Services.AddHttpClient<IAiClient, OpenAiClient>();
         builder.Services.AddScoped<ISignoffReporter, MarkdownSignoffReporter>();
+        builder.Services.AddScoped<ISignoffRule, LocalUrlEvidenceRule>();
 
         var app = builder.Build();
 
