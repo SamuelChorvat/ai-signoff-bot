@@ -2,6 +2,7 @@ using AISignoffBot.Models;
 using AISignoffBot.Services;
 using AISignoffBot.Services.Interfaces;
 using AISignoffBot.Services.V1;
+using AISignoffBot.Services.V2;
 
 namespace AISignoffBot;
 
@@ -20,15 +21,18 @@ public class Program
         
         // Options
         builder.Services.Configure<JiraOptions>(builder.Configuration.GetSection("Jira"));
+        builder.Services.Configure<AiOptions>(builder.Configuration.GetSection("Ai"));
 
         // Services
         builder.Services.AddScoped<IJiraWebhookService, JiraWebhookService>();
         builder.Services.AddScoped<ISignoffWorkflow, SignoffWorkflow>();
+        builder.Services.AddScoped<IEvidenceProvider, JiraEvidenceProvider>();
 
         builder.Services.AddHttpClient<IJiraClient, JiraClient>();
-        
+
         builder.Services.AddScoped<IAcProvider, SimpleAcProvider>();
-        builder.Services.AddScoped<ISignoffEvaluator, RandomSignoffEvaluator>();
+        builder.Services.AddScoped<IAiEvidenceAnalyzer, VisionAiEvidenceAnalyzer>();
+        builder.Services.AddHttpClient<IAiClient, OpenAiClient>();
         builder.Services.AddScoped<ISignoffReporter, MarkdownSignoffReporter>();
 
         var app = builder.Build();

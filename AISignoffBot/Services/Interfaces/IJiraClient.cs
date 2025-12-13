@@ -12,4 +12,5 @@ public interface IJiraClient
     Task SetFlagged(string issueKey, bool flagged, CancellationToken ct = default);
     Task Assign(string issueKey, string accountId, CancellationToken ct = default);
     Task AssignToBot(string issueKey, CancellationToken ct = default);
+    Task<byte[]> DownloadAttachmentAsync(string contentUrl, CancellationToken ct = default);
 }
