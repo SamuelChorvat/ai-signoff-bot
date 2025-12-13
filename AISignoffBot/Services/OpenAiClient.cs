@@ -65,9 +65,23 @@ public class OpenAiClient : IAiClient
         request.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
         using var response = await httpClient.SendAsync(request, ct);
-        response.EnsureSuccessStatusCode();
+        var responseText = await response.Content.ReadAsStringAsync(ct);
 
-        var result = await response.Content.ReadFromJsonAsync<OpenAiChatResponse>(cancellationToken: ct);
+        if (!response.IsSuccessStatusCode)
+        {
+            var reason = string.IsNullOrWhiteSpace(response.ReasonPhrase)
+                ? "Unknown"
+                : response.ReasonPhrase;
+
+            var message = new StringBuilder()
+                .Append($"OpenAI request failed {(int)response.StatusCode} ({reason})")
+                .Append(!string.IsNullOrWhiteSpace(responseText) ? $": {responseText}" : string.Empty)
+                .ToString();
+
+            throw new HttpRequestException(message, null, response.StatusCode);
+        }
+
+        var result = JsonSerializer.Deserialize<OpenAiChatResponse>(responseText);
         var content = result?.Choices?.FirstOrDefault()?.Message?.Content;
 
         if (string.IsNullOrWhiteSpace(content))

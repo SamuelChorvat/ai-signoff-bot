@@ -65,7 +65,11 @@ public class VisionAiEvidenceAnalyzer(
                 _ => "AI request failed"
             };
 
-            return BuildFailureResult(acceptanceCriteria, note);
+            var detail = string.IsNullOrWhiteSpace(ex.Message)
+                ? note
+                : $"{note}: {ex.Message}";
+
+            return BuildFailureResult(acceptanceCriteria, detail);
         }
         catch (Exception ex)
         {
