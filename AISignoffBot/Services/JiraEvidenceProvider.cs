@@ -57,7 +57,21 @@ public class JiraEvidenceProvider(
                 bytes.Length,
                 issueKey);
 
-            evidenceImages.Add(new EvidenceImage(attachment.Filename, attachment.MimeType, bytes, i));
+            var evidenceImage = new EvidenceImage(
+                attachment.Filename,
+                attachment.MimeType,
+                attachment.ContentUrl,
+                bytes,
+                i);
+
+            _logger.LogInformation(
+                "Prepared evidence image {EvidenceKey}: {Filename} ({MimeType}) from {ContentUrl}",
+                evidenceImage.EvidenceKey,
+                evidenceImage.Filename,
+                evidenceImage.MimeType,
+                evidenceImage.AttachmentUrl);
+
+            evidenceImages.Add(evidenceImage);
         }
 
         return evidenceImages;
