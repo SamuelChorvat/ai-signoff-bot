@@ -8,7 +8,8 @@ public interface ISignoffReporter
         JiraIssue issue,
         IReadOnlyList<string> acceptanceCriteria,
         IReadOnlyList<EvidenceImage> evidenceImages,
-        SignoffResult result);
+        SignoffResult result,
+        RuleResult ruleResult);
 
     string FormatEvidenceComment(IReadOnlyList<EvidenceImage> evidenceImages);
 }

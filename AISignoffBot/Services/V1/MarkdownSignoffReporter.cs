@@ -12,44 +12,66 @@ public class MarkdownSignoffReporter : ISignoffReporter
         JiraIssue issue,
         IReadOnlyList<string> acceptanceCriteria,
         IReadOnlyList<EvidenceImage> evidenceImages,
-        SignoffResult result)
+        SignoffResult result,
+        RuleResult ruleResult)
     {
         var sb = new StringBuilder();
+        var overallPassed = result.Passed && ruleResult.Passed;
 
         sb.AppendLine("[AI BOT] AC Signoff (Vision AI)");
         sb.AppendLine($"Issue: {issue.Key} - {issue.Summary}");
-        sb.AppendLine($"Result: {(result.Passed ? "PASS ✅" : "FAIL ❌")}");
+        sb.AppendLine($"Result: {(overallPassed ? "PASS ✅" : "FAIL ❌")}");
         sb.AppendLine();
-
-        if (acceptanceCriteria.Count == 0)
-        {
-            sb.AppendLine("No acceptance criteria found in the description.");
-            return sb.ToString();
-        }
-
-        sb.AppendLine("Acceptance Criteria:");
 
         var evidenceLookup = evidenceImages
             .ToLookup(img => img.Filename, img => img.AttachmentUrl, StringComparer.OrdinalIgnoreCase);
 
-        foreach (var r in result.CriteriaResults)
+        if (acceptanceCriteria.Count == 0)
         {
-            var icon = r.Status switch
-            {
-                AcStatus.Met => "✅",
-                AcStatus.NotMet => "❌",
-                _ => "⚠️"
-            };
+            sb.AppendLine("No acceptance criteria found in the description.");
+        }
+        else
+        {
+            sb.AppendLine("Acceptance Criteria:");
 
-            var evidenceText = FormatEvidenceLinks(r.Evidence, evidenceLookup);
-            var line = $"- {icon} {r.Criterion} — {r.Status} ({r.Notes})";
-
-            if (!string.IsNullOrEmpty(evidenceText))
+            foreach (var r in result.CriteriaResults)
             {
-                line += $" Evidence: {evidenceText}";
+                var icon = r.Status switch
+                {
+                    AcStatus.Met => "✅",
+                    AcStatus.NotMet => "❌",
+                    _ => "⚠️"
+                };
+
+                var evidenceText = FormatEvidenceLinks(r.Evidence, evidenceLookup);
+                var line = $"- {icon} {r.Criterion} — {r.Status} ({r.Notes})";
+
+                if (!string.IsNullOrEmpty(evidenceText))
+                {
+                    line += $" Evidence: {evidenceText}";
+                }
+
+                sb.AppendLine(line);
             }
+        }
 
-            sb.AppendLine(line);
+        if (ruleResult.Failures.Count > 0)
+        {
+            sb.AppendLine();
+            sb.AppendLine("Quality checks failed:");
+
+            foreach (var failure in ruleResult.Failures)
+            {
+                var evidenceText = FormatEvidenceLinks(failure.EvidenceFilenames, evidenceLookup);
+                var line = $"- ❌ {failure.Message}";
+
+                if (!string.IsNullOrEmpty(evidenceText))
+                {
+                    line += $" Evidence: {evidenceText}";
+                }
+
+                sb.AppendLine(line);
+            }
         }
 
         return sb.ToString();
