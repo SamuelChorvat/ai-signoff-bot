@@ -13,21 +13,21 @@ This repository evolves in clear iterations. Each version builds on the previous
 
 **Status:** ✅ Implemented
 
-V2 brings the AI experience to life by pulling real Jira evidence and sending it to a vision model.
+V2 now grabs real Jira evidence and sends it to a vision model for AC checks.
 
 ### What V2 adds
 
 - **Jira evidence ingestion**
-  - Collects the most recent PNG/JPEG/WEBP attachments (capped by configuration) and downloads the bytes for analysis.
-  - Posts an evidence summary comment listing which files were pulled into the run.
+  - Pulls the most recent PNG/JPEG/WEBP attachments (capped by configuration) and downloads them for analysis.
+  - Posts a short comment listing which files were used in the run.
 
 - **Vision-based AC evaluation**
-  - Sends acceptance criteria plus the gathered images to an AI vision model and maps its JSON response back to the AC list.
-  - Falls back to explicit "NotMet"/"NoEvidence" notes when the AI response is invalid or missing fields.
-  - Includes a fake analyzer option for demos that marks only the first criterion as met.
+  - Sends acceptance criteria plus the gathered images to a vision model and maps its JSON response back to the AC list.
+  - Falls back to "NotMet"/"NoEvidence" when the AI response is invalid or missing fields.
+  - Includes a fake analyzer for demos that marks only the first criterion as met.
 
 - **Configurable AI settings**
-  - Supports provider/model/API key configuration (defaults to OpenAI gpt-4o) via `appsettings.json`.
+  - Provider/model/API key are configurable (defaults to OpenAI gpt-4o) via `appsettings.json`.
 
 ---
 
