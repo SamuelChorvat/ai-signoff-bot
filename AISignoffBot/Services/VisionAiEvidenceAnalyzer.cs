@@ -8,7 +8,7 @@ using AISignoffBot.Models;
 using AISignoffBot.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
-namespace AISignoffBot.Services.V2;
+namespace AISignoffBot.Services;
 
 public class VisionAiEvidenceAnalyzer(
     ILogger<VisionAiEvidenceAnalyzer> logger,

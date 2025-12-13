@@ -1,6 +1,6 @@
-﻿using AISignoffBot.Services.Interfaces;
+using AISignoffBot.Services.Interfaces;
 
-namespace AISignoffBot.Services.V1;
+namespace AISignoffBot.Services;
 
 public class SimpleAcProvider : IAcProvider
 {
