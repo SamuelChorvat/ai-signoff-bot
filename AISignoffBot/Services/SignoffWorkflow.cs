@@ -16,7 +16,7 @@ public class SignoffWorkflow(
     private const string LabelSignedOff = "ai_signed_off";
     private const string LabelNeedsHuman = "needs_human_review";
     private const string LabelAddressing = "addressing_ai_feedback";
-    private const string LabelProcessing = "ai_processing";
+    private const string LabelProcessing = "ai_processing_in_progress";
     
     private static readonly string[] AiLabels =
     [
