@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Linq;
 using AISignoffBot.Enums;
 using AISignoffBot.Models;
 using AISignoffBot.Services.Interfaces;
@@ -39,5 +40,36 @@ public class MarkdownSignoffReporter : ISignoffReporter
         sb.AppendLine("Note: V1 uses a stub evaluator (randomised). AI analysis will replace this.");
 
         return sb.ToString();
+    }
+
+    public string FormatEvidenceComment(IReadOnlyList<EvidenceImage> evidenceImages)
+    {
+        var sb = new StringBuilder();
+
+        if (evidenceImages.Count == 0)
+        {
+            sb.Append("[AI BOT] Evidence: no images found.");
+            return sb.ToString();
+        }
+
+        sb.AppendLine($"[AI BOT] Evidence: found {evidenceImages.Count} image(s)");
+
+        foreach (var image in evidenceImages.OrderBy(e => e.Index))
+        {
+            sb.AppendLine($"- img{image.Index + 1}: {image.Filename} ({FormatKilobytes(image.Bytes.Length)})");
+        }
+
+        return sb.ToString();
+    }
+
+    private static string FormatKilobytes(int byteCount)
+    {
+        if (byteCount <= 0)
+        {
+            return "0KB";
+        }
+
+        var kb = byteCount / 1024d;
+        return kb < 0.1 ? $"{byteCount}B" : $"{Math.Round(kb, 1)}KB";
     }
 }

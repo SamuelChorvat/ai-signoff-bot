@@ -61,7 +61,8 @@ public class SignoffWorkflow(
 
         // 4) Gather evidence
         var evidenceImages = await evidenceProvider.GetLatestImagesAsync(issueKey, ct);
-        await CommentEvidenceAsync(issueKey, evidenceImages, ct);
+        var evidenceComment = reporter.FormatEvidenceComment(evidenceImages);
+        await jira.AddComment(issueKey, evidenceComment, ct);
 
         // 5) Evaluate (stub for V1)
         var result = await evaluator.EvaluateAsync(acs, ct);
@@ -94,31 +95,6 @@ public class SignoffWorkflow(
         logger.LogInformation("Completed signoff for {IssueKey} (Passed: {Passed})", issueKey, result.Passed);
     }
 
-    private async Task CommentEvidenceAsync(string issueKey, IReadOnlyList<EvidenceImage> evidenceImages, CancellationToken ct)
-    {
-        var count = evidenceImages.Count;
-        var details = evidenceImages
-            .OrderBy(e => e.Index)
-            .Select(e => $"img{e.Index + 1}: {e.Filename} ({FormatKilobytes(e.Bytes.Length)})");
-
-        var message = count > 0
-            ? $"[AI BOT] Found {count} image(s): {string.Join(", ", details)}"
-            : "[AI BOT] Found 0 image(s).";
-
-        await jira.AddComment(issueKey, message, ct);
-    }
-
-    private static string FormatKilobytes(int byteCount)
-    {
-        if (byteCount <= 0)
-        {
-            return "0KB";
-        }
-
-        var kb = byteCount / 1024d;
-        return kb < 0.1 ? $"{byteCount}B" : $"{Math.Round(kb, 1)}KB";
-    }
-    
     private async Task ResetForQaAsync(string issueKey, CancellationToken ct)
     {
         logger.LogInformation("Resetting AI state for {IssueKey} (moved to QA)", issueKey);
