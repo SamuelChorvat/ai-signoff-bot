@@ -1,6 +1,7 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Linq;
 using AISignoffBot.Models;
 using AISignoffBot.Services.Interfaces;
 using Microsoft.Extensions.Options;
@@ -93,7 +94,12 @@ public class JiraClient : IJiraClient
             }
         }
 
-        _logger.LogInformation("Retrieved {AttachmentCount} attachments for {IssueKey}", attachments.Count, key);
+        var attachmentNames = attachments.Select(a => a.Filename).Where(n => !string.IsNullOrWhiteSpace(n)).ToArray();
+        _logger.LogInformation(
+            "Retrieved {AttachmentCount} attachments for {IssueKey}. Names: {AttachmentNames}",
+            attachments.Count,
+            key,
+            attachmentNames.Length > 0 ? string.Join(", ", attachmentNames) : "<none>");
 
         return new JiraIssue(key, summary, description, labels, attachments);
     }
