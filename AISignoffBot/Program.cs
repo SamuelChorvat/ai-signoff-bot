@@ -36,6 +36,7 @@ public class Program
         builder.Services.AddHttpClient<IAiClient, OpenAiClient>();
         builder.Services.AddScoped<ISignoffReporter, MarkdownSignoffReporter>();
         builder.Services.AddScoped<ISignoffRule, LocalUrlEvidenceRule>();
+        builder.Services.AddScoped<ISignoffRule, BrowserUrlBarRule>();
 
         var app = builder.Build();
 
