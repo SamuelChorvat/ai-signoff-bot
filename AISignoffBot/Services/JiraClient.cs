@@ -52,16 +52,16 @@ public class JiraClient : IJiraClient
         _logger.LogInformation("Fetching Jira issue {IssueKey} from {Url}", issueKey, url);
 
         var response = await _httpClient.GetAsync(url, ct);
-        var content = await response.Content.ReadAsStringAsync(ct);
+        var responseContent = await response.Content.ReadAsStringAsync(ct);
 
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogError("GetIssue failed {StatusCode} for {IssueKey}. Body: {Body}",
-                response.StatusCode, issueKey, content);
-            throw new HttpRequestException($"GetIssue failed {response.StatusCode}: {content}");
+                response.StatusCode, issueKey, responseContent);
+            throw new HttpRequestException($"GetIssue failed {response.StatusCode}: {responseContent}");
         }
 
-        using var doc = JsonDocument.Parse(content);
+        using var doc = JsonDocument.Parse(responseContent);
         var root = doc.RootElement;
 
         var key = root.GetProperty("key").GetString() ?? issueKey;
@@ -87,7 +87,7 @@ public class JiraClient : IJiraClient
             {
                 var filename = attachmentEl.TryGetProperty("filename", out var fn) ? (fn.GetString() ?? string.Empty) : string.Empty;
                 var mimeType = attachmentEl.TryGetProperty("mimeType", out var mt) ? (mt.GetString() ?? string.Empty) : string.Empty;
-                var contentUrl = attachmentEl.TryGetProperty("content", out var content) ? (content.GetString() ?? string.Empty) : string.Empty;
+                var contentUrl = attachmentEl.TryGetProperty("content", out var contentProperty) ? (contentProperty.GetString() ?? string.Empty) : string.Empty;
 
                 attachments.Add(new JiraAttachment(filename, mimeType, contentUrl));
             }
