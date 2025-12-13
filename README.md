@@ -23,7 +23,6 @@ V2 grabs real Jira evidence and runs AC checks with a vision model.
 - **Vision-based AC evaluation**
   - Sends the AC list and gathered images to a vision model, then maps the JSON response back to each AC.
   - Falls back to "NotMet"/"NoEvidence" when the AI reply is missing fields or malformed.
-  - Includes a fake analyzer for demos that marks only the first criterion as met.
 
 - **Configurable AI settings**
   - Provider/model/API key are configurable (default OpenAI gpt-4o) in `appsettings.json`.
