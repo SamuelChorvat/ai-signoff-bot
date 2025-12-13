@@ -1,4 +1,5 @@
 ﻿using AISignoffBot.Enums;
+using AISignoffBot.Models;
 using AISignoffBot.Services.Interfaces;
 
 namespace AISignoffBot.Services;
@@ -7,6 +8,7 @@ public class SignoffWorkflow(
     ILogger<SignoffWorkflow> logger,
     IJiraClient jira,
     IAcProvider acProvider,
+    IEvidenceProvider evidenceProvider,
     ISignoffEvaluator evaluator,
     ISignoffReporter reporter)
     : ISignoffWorkflow
@@ -57,17 +59,21 @@ public class SignoffWorkflow(
         // 3) Extract ACs
         var acs = acProvider.ExtractAcceptanceCriteria(issue.Description);
 
-        // 4) Evaluate (stub for V1)
+        // 4) Gather evidence
+        var evidenceImages = await evidenceProvider.GetLatestImagesAsync(issueKey, ct);
+        await CommentEvidenceAsync(issueKey, evidenceImages, ct);
+
+        // 5) Evaluate (stub for V1)
         var result = await evaluator.EvaluateAsync(acs, ct);
 
-        // 5) Comment
+        // 6) Comment
         var comment = reporter.FormatComment(issue, acs, result);
         await jira.AddComment(issueKey, comment, ct);
 
-        // 6) Mark processed (prevents loops)
+        // 7) Mark processed (prevents loops)
         await jira.AddLabels(issueKey, [LabelProcessed], ct);
 
-        // 7) Outcome actions
+        // 8) Outcome actions
         if (result.Passed)
         {
             await jira.AddLabels(issueKey, [LabelSignedOff], ct);
@@ -86,6 +92,31 @@ public class SignoffWorkflow(
         }
 
         logger.LogInformation("Completed signoff for {IssueKey} (Passed: {Passed})", issueKey, result.Passed);
+    }
+
+    private async Task CommentEvidenceAsync(string issueKey, IReadOnlyList<EvidenceImage> evidenceImages, CancellationToken ct)
+    {
+        var count = evidenceImages.Count;
+        var details = evidenceImages
+            .OrderBy(e => e.Index)
+            .Select(e => $"img{e.Index + 1}: {e.Filename} ({FormatKilobytes(e.Bytes.Length)})");
+
+        var message = count > 0
+            ? $"[AI BOT] Found {count} image(s): {string.Join(", ", details)}"
+            : "[AI BOT] Found 0 image(s).";
+
+        await jira.AddComment(issueKey, message, ct);
+    }
+
+    private static string FormatKilobytes(int byteCount)
+    {
+        if (byteCount <= 0)
+        {
+            return "0KB";
+        }
+
+        var kb = byteCount / 1024d;
+        return kb < 0.1 ? $"{byteCount}B" : $"{Math.Round(kb, 1)}KB";
     }
     
     private async Task ResetForQaAsync(string issueKey, CancellationToken ct)
