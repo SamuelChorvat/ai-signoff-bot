@@ -82,8 +82,8 @@ public class VisionAiEvidenceAnalyzer(
     {
         var sb = new StringBuilder();
         sb.AppendLine("You are an expert QA assistant that verifies acceptance criteria using provided screenshots only.");
-        sb.AppendLine("You will receive images indexed img1..imgN.");
-        sb.AppendLine("Do not depend on image file names or assume they relate to the story; only trust visible content.");
+        sb.AppendLine("You will receive images with their original filenames. Use the filenames exactly as provided when citing evidence.");
+        sb.AppendLine("Do not assume filenames relate to the story; only trust visible content.");
         sb.AppendLine("If a criterion is not clearly visible in any image, set the status to NoEvidence.");
 
         return sb.ToString();
@@ -114,7 +114,7 @@ public class VisionAiEvidenceAnalyzer(
         {
             foreach (var image in evidenceImages.OrderBy(i => i.Index))
             {
-                sb.AppendLine($"- img{image.Index + 1}: screenshot available");
+                sb.AppendLine($"- {image.Filename}: screenshot available");
             }
         }
 
@@ -123,10 +123,10 @@ public class VisionAiEvidenceAnalyzer(
         sb.AppendLine("{");
         sb.AppendLine("  \"passed\": true|false,  // true only if every AC is Met");
         sb.AppendLine("  \"criteria\": [");
-        sb.AppendLine("    { \"index\": 1, \"status\": \"Met|NotMet|NoEvidence\", \"notes\": \"short reason\", \"evidence\": [\"img1\"] }");
+        sb.AppendLine("    { \"index\": 1, \"status\": \"Met|NotMet|NoEvidence\", \"notes\": \"short reason\", \"evidence\": [\"filename.png\"] }");
         sb.AppendLine("  ]");
         sb.AppendLine("}");
-        sb.AppendLine("Use NoEvidence when the requirement is not visible. Reference images by img1, img2, etc.");
+        sb.AppendLine("Use NoEvidence when the requirement is not visible. Reference images by their exact filenames (e.g., login.png).");
 
         return sb.ToString();
     }

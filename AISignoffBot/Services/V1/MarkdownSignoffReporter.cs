@@ -52,7 +52,7 @@ public class MarkdownSignoffReporter : ISignoffReporter
 
         foreach (var image in evidenceImages.OrderBy(e => e.Index))
         {
-            sb.AppendLine($"- img{image.Index + 1}: {image.Filename} ({FormatKilobytes(image.Bytes.Length)})");
+            sb.AppendLine($"- {image.Filename} ({FormatKilobytes(image.Bytes.Length)})");
         }
 
         return sb.ToString();
