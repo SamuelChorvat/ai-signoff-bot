@@ -16,13 +16,11 @@ public class JiraEvidenceProvider(
         "image/webp"
     };
 
-    private readonly IJiraClient _jiraClient = jiraClient;
-    private readonly ILogger<JiraEvidenceProvider> _logger = logger;
     private readonly JiraOptions _options = options.Value;
 
     public async Task<IReadOnlyList<EvidenceImage>> GetLatestImagesAsync(string issueKey, CancellationToken ct = default)
     {
-        var issue = await _jiraClient.GetIssue(issueKey, ct);
+        var issue = await jiraClient.GetIssue(issueKey, ct);
 
         var imageAttachments = issue.Attachments
             .Where(a => AllowedMimeTypes.Contains(a.MimeType))
@@ -30,7 +28,7 @@ public class JiraEvidenceProvider(
             .Take(_options.MaxEvidenceImages)
             .ToList();
 
-        _logger.LogInformation(
+        logger.LogInformation(
             "Found {Count} image attachments for {IssueKey} (limit {Limit})",
             imageAttachments.Count,
             issueKey,
@@ -42,15 +40,15 @@ public class JiraEvidenceProvider(
         {
             var attachment = imageAttachments[i];
 
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Downloading attachment {Filename} ({MimeType}) for {IssueKey}",
                 attachment.Filename,
                 attachment.MimeType,
                 issueKey);
 
-            var bytes = await _jiraClient.DownloadAttachmentAsync(attachment.ContentUrl, ct);
+            var bytes = await jiraClient.DownloadAttachmentAsync(attachment.ContentUrl, ct);
 
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Downloaded attachment {Filename} ({MimeType}) with {ByteCount} bytes for {IssueKey}",
                 attachment.Filename,
                 attachment.MimeType,
@@ -64,7 +62,7 @@ public class JiraEvidenceProvider(
                 bytes,
                 i);
 
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Prepared evidence image {EvidenceKey}: {Filename} ({MimeType}) from {ContentUrl}",
                 evidenceImage.EvidenceKey,
                 evidenceImage.Filename,

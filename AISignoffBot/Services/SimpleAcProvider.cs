@@ -9,7 +9,7 @@ public class SimpleAcProvider : IAcProvider
     // - something
     public IReadOnlyList<string> ExtractAcceptanceCriteria(string? description)
     {
-        if (string.IsNullOrWhiteSpace(description)) return Array.Empty<string>();
+        if (string.IsNullOrWhiteSpace(description)) return [];
 
         // Minimal: take bullet lines after a heading "Acceptance Criteria:"
         var idx = description.IndexOf("Acceptance Criteria", StringComparison.OrdinalIgnoreCase);

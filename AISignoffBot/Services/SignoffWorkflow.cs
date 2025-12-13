@@ -118,7 +118,7 @@ public class SignoffWorkflow(
     {
         if (!rules.Any())
         {
-            return new RuleResult(Array.Empty<RuleFailure>());
+            return new RuleResult([]);
         }
 
         var failures = new List<RuleFailure>();

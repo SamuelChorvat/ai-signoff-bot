@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -21,7 +20,7 @@ public class LocalUrlEvidenceRule(
     {
         if (evidenceImages.Count == 0)
         {
-            return new RuleResult(Array.Empty<RuleFailure>());
+            return new RuleResult([]);
         }
 
         try
@@ -36,18 +35,18 @@ public class LocalUrlEvidenceRule(
             var failures = EvaluateFindings(parsed);
 
             return failures.Count == 0
-                ? new RuleResult(Array.Empty<RuleFailure>())
-                : new RuleResult([new RuleFailure(BuildFailureMessage(failures), failures)]);
+                ? new RuleResult([])
+                : new RuleResult([new RuleFailure(BuildFailureMessage(), failures)]);
         }
         catch (JsonException ex)
         {
             logger.LogWarning(ex, "Local URL rule: AI returned invalid JSON");
-            return new RuleResult(Array.Empty<RuleFailure>());
+            return new RuleResult([]);
         }
         catch (HttpRequestException ex)
         {
             logger.LogError(ex, "Local URL rule: AI request failed");
-            return new RuleResult(Array.Empty<RuleFailure>());
+            return new RuleResult([]);
         }
     }
 
@@ -109,7 +108,7 @@ public class LocalUrlEvidenceRule(
         return flagged.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
     }
 
-    private static string BuildFailureMessage(IEnumerable<string> filenames)
+    private static string BuildFailureMessage()
     {
         return "Evidence shows a local/private URL (e.g., localhost). Provide screenshots from a shared environment.";
     }
@@ -187,7 +186,7 @@ public class LocalUrlEvidenceRule(
     private class AddressBarResponse
     {
         [JsonPropertyName("screens")]
-        public List<AddressBarFinding> Screens { get; set; } = new();
+        public List<AddressBarFinding> Screens { get; set; } = [];
     }
 
     private class AddressBarFinding
