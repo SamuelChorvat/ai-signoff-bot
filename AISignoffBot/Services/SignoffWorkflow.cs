@@ -1,4 +1,5 @@
-﻿using AISignoffBot.Enums;
+using System.Diagnostics;
+using AISignoffBot.Enums;
 using AISignoffBot.Models;
 using AISignoffBot.Services.Interfaces;
 
@@ -63,6 +64,8 @@ public class SignoffWorkflow(
 
         try
         {
+            var stopwatch = Stopwatch.StartNew();
+
             // 3) Extract ACs
             var acs = acProvider.ExtractAcceptanceCriteria(issue.Description);
 
@@ -77,8 +80,11 @@ public class SignoffWorkflow(
             var ruleResult = await EvaluateRulesAsync(evidenceImages, ct);
             var overallPassed = result.Passed && ruleResult.Passed;
 
+            stopwatch.Stop();
+            var processingTime = stopwatch.Elapsed;
+
             // 6) Comment
-            var comment = reporter.FormatComment(issue, acs, evidenceImages, result, ruleResult);
+            var comment = reporter.FormatComment(issue, acs, evidenceImages, result, ruleResult, processingTime);
             await jira.AddComment(issueKey, comment, ct);
 
             // 7) Mark processed (prevents loops)
