@@ -125,9 +125,9 @@ public class MarkdownSignoffReporter : ISignoffReporter
     {
         return status switch
         {
-            AcStatus.Met => "{status:colour=Green|title=Met}",
-            AcStatus.NotMet => "{status:colour=Red|title=Not Met}",
-            _ => "{status:colour=Orange|title=No Evidence}"
+            AcStatus.Met => "Met",
+            AcStatus.NotMet => "Not Met",
+            _ => "No Evidence"
         };
     }
 
