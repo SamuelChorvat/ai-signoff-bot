@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using AISignoffBot.Enums;
 using AISignoffBot.Models;
@@ -12,7 +13,8 @@ public class MarkdownSignoffReporter : ISignoffReporter
         IReadOnlyList<string> acceptanceCriteria,
         IReadOnlyList<EvidenceImage> evidenceImages,
         SignoffResult result,
-        RuleResult ruleResult)
+        RuleResult ruleResult,
+        TimeSpan processingTime)
     {
         var sb = new StringBuilder();
         var overallPassed = result.Passed && ruleResult.Passed;
@@ -20,6 +22,7 @@ public class MarkdownSignoffReporter : ISignoffReporter
         sb.AppendLine("AC Signoff (Vision AI)");
         sb.AppendLine($"Issue: {issue.Key} - {issue.Summary}");
         sb.AppendLine($"Result: {(overallPassed ? "PASS ✅" : "FAIL ❌")}");
+        sb.AppendLine($"Processing time: {FormatDuration(processingTime)}");
         sb.AppendLine();
 
         var evidenceLookup = evidenceImages
@@ -135,5 +138,20 @@ public class MarkdownSignoffReporter : ISignoffReporter
 
         var kb = byteCount / 1024d;
         return kb < 0.1 ? $"{byteCount}B" : $"{Math.Round(kb, 1)}KB";
+    }
+
+    private static string FormatDuration(TimeSpan duration)
+    {
+        if (duration.TotalHours >= 1)
+        {
+            return $"{(int)duration.TotalHours}h {duration.Minutes:D2}m {duration.Seconds + duration.Milliseconds / 1000d:F1}s";
+        }
+
+        if (duration.TotalMinutes >= 1)
+        {
+            return $"{(int)duration.TotalMinutes}m {duration.Seconds + duration.Milliseconds / 1000d:F1}s";
+        }
+
+        return $"{duration.TotalSeconds:F2}s";
     }
 }

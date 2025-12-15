@@ -1,4 +1,5 @@
-﻿using AISignoffBot.Models;
+using System;
+using AISignoffBot.Models;
 
 namespace AISignoffBot.Services.Interfaces;
 
@@ -9,7 +10,8 @@ public interface ISignoffReporter
         IReadOnlyList<string> acceptanceCriteria,
         IReadOnlyList<EvidenceImage> evidenceImages,
         SignoffResult result,
-        RuleResult ruleResult);
+        RuleResult ruleResult,
+        TimeSpan processingTime);
 
     string FormatEvidenceComment(IReadOnlyList<EvidenceImage> evidenceImages);
 }
