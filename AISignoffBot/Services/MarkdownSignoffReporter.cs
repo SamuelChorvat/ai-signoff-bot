@@ -45,7 +45,7 @@ public class MarkdownSignoffReporter : ISignoffReporter
                 };
 
                 var evidenceText = FormatEvidenceLinks(r.Evidence, evidenceLookup);
-                var line = $"- {icon} {r.Criterion} — {r.Status} ({r.Notes})";
+                var line = $"- {icon} {r.Criterion} — {FormatStatus(r.Status)} ({r.Notes})";
 
                 if (!string.IsNullOrEmpty(evidenceText))
                 {
@@ -119,6 +119,16 @@ public class MarkdownSignoffReporter : ISignoffReporter
         }
 
         return string.Join(", ", links);
+    }
+
+    private static string FormatStatus(AcStatus status)
+    {
+        return status switch
+        {
+            AcStatus.Met => "Met",
+            AcStatus.NotMet => "Not Met",
+            _ => "No Evidence"
+        };
     }
 
     private static string FormatEvidenceLink(string filename, string? url)
