@@ -2,9 +2,9 @@ namespace AISignoffBot.Models;
 
 public class AiOptions
 {
-    public string Provider { get; set; } = "OpenAI";
+    public string Provider { get; init; } = "OpenAI";
 
-    public string Model { get; set; } = "gpt-4o";
+    public string Model { get; init; } = "gpt-4o";
 
-    public string ApiKey { get; set; } = string.Empty;
+    public string ApiKey { get; init; } = string.Empty;
 }
