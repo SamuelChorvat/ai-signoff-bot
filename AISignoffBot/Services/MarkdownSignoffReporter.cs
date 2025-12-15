@@ -22,7 +22,7 @@ public class MarkdownSignoffReporter : ISignoffReporter
         sb.AppendLine("AC Signoff (Vision AI)");
         sb.AppendLine($"Issue: {issue.Key} - {issue.Summary}");
         sb.AppendLine($"Result: {(overallPassed ? "PASS ✅" : "FAIL ❌")}");
-        sb.AppendLine($"Processing time: {FormatDuration(processingTime)}");
+        sb.AppendLine($"⏱️ Processing time: {FormatDuration(processingTime)}");
         sb.AppendLine();
 
         var evidenceLookup = evidenceImages
