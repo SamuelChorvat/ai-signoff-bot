@@ -155,7 +155,7 @@ public class SignoffWorkflow(
 
         await jira.AddComment(
             issueKey,
-            "[AI BOT] Cleared AI review state (flag + labels) as issue moved back to QA. Label added: addressing_ai_feedback.",
+            "Cleared AI review state (flag + labels) as issue moved back to QA. Label added: addressing_ai_feedback.",
             ct);
     }
 

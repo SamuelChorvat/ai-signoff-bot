@@ -21,6 +21,7 @@ public class Program
         // Options
         builder.Services.Configure<JiraOptions>(builder.Configuration.GetSection("Jira"));
         builder.Services.Configure<AiOptions>(builder.Configuration.GetSection("Ai"));
+        builder.Services.Configure<CommentFooterOptions>(builder.Configuration.GetSection("CommentFooter"));
 
         // Services
         builder.Services.AddScoped<IJiraWebhookService, JiraWebhookService>();
@@ -28,6 +29,9 @@ public class Program
         builder.Services.AddScoped<IEvidenceProvider, JiraEvidenceProvider>();
 
         builder.Services.AddHttpClient<IJiraClient, JiraClient>();
+
+        builder.Services.AddSingleton<IBuildInfoProvider, BuildInfoProvider>();
+        builder.Services.AddSingleton<ICommentFormatter, CommentFormatter>();
 
         builder.Services.AddScoped<IAcProvider, SimpleAcProvider>();
         builder.Services.AddScoped<IAiEvidenceAnalyzer, VisionAiEvidenceAnalyzer>();

@@ -17,7 +17,7 @@ public class MarkdownSignoffReporter : ISignoffReporter
         var sb = new StringBuilder();
         var overallPassed = result.Passed && ruleResult.Passed;
 
-        sb.AppendLine("[AI BOT] AC Signoff (Vision AI)");
+        sb.AppendLine("AC Signoff (Vision AI)");
         sb.AppendLine($"Issue: {issue.Key} - {issue.Summary}");
         sb.AppendLine($"Result: {(overallPassed ? "PASS ✅" : "FAIL ❌")}");
         sb.AppendLine();
@@ -82,11 +82,11 @@ public class MarkdownSignoffReporter : ISignoffReporter
 
         if (evidenceImages.Count == 0)
         {
-            sb.Append("[AI BOT] Evidence: no images found.");
+            sb.Append("Evidence: no images found.");
             return sb.ToString();
         }
 
-        sb.AppendLine($"[AI BOT] Evidence: found {evidenceImages.Count} image(s)");
+        sb.AppendLine($"Evidence: found {evidenceImages.Count} image(s)");
 
         foreach (var image in evidenceImages.OrderBy(e => e.Index))
         {
