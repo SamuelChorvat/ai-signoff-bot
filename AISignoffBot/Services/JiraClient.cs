@@ -12,7 +12,7 @@ public class JiraClient : IJiraClient
     private readonly HttpClient _httpClient;
     private readonly JiraOptions _options;
     private readonly ILogger<JiraClient> _logger;
-    private readonly ICommentFormatter commentFormatter;
+    private readonly ICommentFormatter _commentFormatter;
     
     private string? _flaggedFieldId;
     private readonly SemaphoreSlim _flaggedFieldLock = new(1, 1);
@@ -30,7 +30,7 @@ public class JiraClient : IJiraClient
         _httpClient = httpClient;
         _options = options.Value;
         _logger = logger;
-        this.commentFormatter = commentFormatter;
+        _commentFormatter = commentFormatter;
 
         if (string.IsNullOrWhiteSpace(_options.BaseUrl) ||
             string.IsNullOrWhiteSpace(_options.Email) ||
@@ -114,7 +114,7 @@ public class JiraClient : IJiraClient
     {
         // v2 accepts plain string comment body
         var url = $"{_options.BaseUrl}/rest/api/2/issue/{issueKey}/comment";
-        var payload = new { body = commentFormatter.WithFooter(comment) };
+        var payload = new { body = _commentFormatter.WithFooter(comment) };
 
         _logger.LogInformation("Adding comment to {IssueKey}", issueKey);
 
