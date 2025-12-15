@@ -1,5 +1,5 @@
 using System.Diagnostics;
-﻿using AISignoffBot.Enums;
+using AISignoffBot.Enums;
 using AISignoffBot.Models;
 using AISignoffBot.Services.Interfaces;
 
