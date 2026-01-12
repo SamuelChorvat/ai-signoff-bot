@@ -35,22 +35,21 @@ AI Signoff Bot automates Jira signoff by evaluating acceptance criteria with a v
 
 ## Future Work
 - **Video test evidence via frame sampling (not full video analysis)**  
-  - Extend evidence analysis from screenshots to screen-recorded videos by treating recordings as sampled still frames or short segments rather than continuous playback.
-  - Especially suitable for UI testing, screen recordings without audio, and flows already validated visually.
-  - Frame sampling keeps analysis more cost-effective, deterministic, and easier to reason about than full video understanding.
-  - Future iterations could evaluate dedicated video-capable models, but frame sampling remains the primary path.
+  - Treat screen recordings as sampled frames or short clips, not continuous playback.
+  - Best for UI testing, silent recordings, and flows already validated visually.
+  - Sampling is cheaper, more deterministic, and easier to reason about.
+  - Dedicated video models could be explored later, but sampling stays the main path.
 - **Test evidence versioning and change detection**  
-  - Track evidence across multiple AI signoff runs.
-  - Detect what changed since the last attempt, including new screenshots and removed or replaced evidence.
-  - Highlight improvements or regressions directly in the signoff comment so reviewers can quickly see what was fixed after feedback.
-  - Supports iterative QA workflows and more meaningful re-runs.
+  - Track evidence across signoff runs.
+  - Detect new, removed, or replaced screenshots.
+  - Call out improvements/regressions in the signoff comment.
+  - Makes re-runs more useful in iterative QA.
 - **Evidence quality and completeness metrics (non-blocking)**  
-  - Introduce informational metrics such as AC coverage percentage, evidence per AC, and basic clarity or resolution checks.
-  - Keep metrics advisory only to support human judgment without gating signoff or acting as probabilistic pass/fail scoring.
+  - Add informational metrics: AC coverage %, evidence per AC, basic clarity/resolution checks.
+  - Advisory only; no gating or confidence scoring.
 - **Design intent comparison (e.g. Figma)**  
-  - Add an optional, higher-level check that compares test evidence against design intent rather than pixel-perfect diffs.
-  - Focus on missing components, unexpected UI elements, or obvious layout and hierarchy issues.
-  - This is an aspirational capability that helps align UI outputs with design expectations.
+  - Optional, higher-level check against design intent instead of pixel diffs.
+  - Look for missing components, unexpected UI, and obvious layout/hierarchy issues.
 - **AI-suggested missing Acceptance Criteria and edge cases**  
-  - Use AI to suggest additional ACs or edge-case tests as non-blocking, advisory recommendations.
-  - Improve test coverage and prompt teams to consider gaps without rewriting or replacing requirements.
+  - AI suggests missing ACs or edge-case tests.
+  - Advisory only; helps coverage without changing requirements.
