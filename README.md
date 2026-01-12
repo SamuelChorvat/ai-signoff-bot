@@ -33,9 +33,6 @@ AI Signoff Bot automates Jira signoff by evaluating acceptance criteria with a v
 - Set Jira connection details under `Jira` in `appsettings.json`.
 - Configure AI provider, model, and API key under `Ai` in `appsettings.json` (OpenAI gpt-4o by default).
 
-## Team
-Built by **Not Great, Not Terrible** ☢️
-
 ## Future Work
 - **Video test evidence via frame sampling (not full video analysis)**  
   - Extend evidence analysis from screenshots to screen-recorded videos by treating recordings as sampled still frames or short segments rather than continuous playback.
