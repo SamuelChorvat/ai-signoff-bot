@@ -38,12 +38,22 @@ Built by **Not Great, Not Terrible** ☢️
 
 ## Future Work
 - **Video test evidence via frame sampling (not full video analysis)**  
-  Extend evidence analysis from screenshots to screen-recorded videos by treating recordings as sampled still frames or short segments rather than continuous playback. This is especially suitable for UI testing, screen recordings without audio, and flows already validated visually. The sampling approach keeps analysis more cost-effective, deterministic, and easier to reason about than full video understanding. Future iterations could evaluate dedicated video-capable models, but frame sampling remains the primary path.
+  - Extend evidence analysis from screenshots to screen-recorded videos by treating recordings as sampled still frames or short segments rather than continuous playback.
+  - Especially suitable for UI testing, screen recordings without audio, and flows already validated visually.
+  - Frame sampling keeps analysis more cost-effective, deterministic, and easier to reason about than full video understanding.
+  - Future iterations could evaluate dedicated video-capable models, but frame sampling remains the primary path.
 - **Test evidence versioning and change detection**  
-  Track evidence across multiple AI signoff runs and detect what changed since the last attempt (new screenshots, removed or replaced evidence). Highlight improvements or regressions directly in the signoff comment so reviewers can quickly see what was fixed after feedback, supporting iterative QA workflows and more meaningful re-runs.
+  - Track evidence across multiple AI signoff runs.
+  - Detect what changed since the last attempt, including new screenshots and removed or replaced evidence.
+  - Highlight improvements or regressions directly in the signoff comment so reviewers can quickly see what was fixed after feedback.
+  - Supports iterative QA workflows and more meaningful re-runs.
 - **Evidence quality and completeness metrics (non-blocking)**  
-  Introduce informational metrics such as AC coverage percentage, evidence per AC, and basic clarity or resolution checks. These metrics should remain advisory only—supporting human judgment without gating signoff or acting as probabilistic pass/fail scoring.
+  - Introduce informational metrics such as AC coverage percentage, evidence per AC, and basic clarity or resolution checks.
+  - Keep metrics advisory only to support human judgment without gating signoff or acting as probabilistic pass/fail scoring.
 - **Design intent comparison (e.g. Figma)**  
-  Add an optional, higher-level check that compares test evidence against design intent rather than pixel-perfect diffs, focusing on missing components, unexpected UI elements, or obvious layout/hierarchy issues. This is an aspirational capability that helps align UI outputs with design expectations.
+  - Add an optional, higher-level check that compares test evidence against design intent rather than pixel-perfect diffs.
+  - Focus on missing components, unexpected UI elements, or obvious layout and hierarchy issues.
+  - This is an aspirational capability that helps align UI outputs with design expectations.
 - **AI-suggested missing Acceptance Criteria and edge cases**  
-  Use AI to suggest additional ACs or edge-case tests as non-blocking, advisory recommendations. The goal is to improve test coverage and prompt teams to consider gaps without rewriting or replacing requirements.
+  - Use AI to suggest additional ACs or edge-case tests as non-blocking, advisory recommendations.
+  - Improve test coverage and prompt teams to consider gaps without rewriting or replacing requirements.
