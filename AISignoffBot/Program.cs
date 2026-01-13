@@ -55,7 +55,9 @@ public class Program
 
         app.UseAuthorization();
 
-        app.MapHealthChecks("/health");
+        app.MapHealthChecks("/health")
+            .WithTags("Health")
+            .WithOpenApi();
 
         app.MapControllers();
 
