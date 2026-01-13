@@ -33,5 +33,23 @@ AI Signoff Bot automates Jira signoff by evaluating acceptance criteria with a v
 - Set Jira connection details under `Jira` in `appsettings.json`.
 - Configure AI provider, model, and API key under `Ai` in `appsettings.json` (OpenAI gpt-4o by default).
 
-## Team
-Built by **Not Great, Not Terrible** ☢️
+## Future Work
+- **Video test evidence via frame sampling (not full video analysis)**  
+  - Treat screen recordings as sampled frames or short clips, not continuous playback.
+  - Best for UI testing, silent recordings, and flows already validated visually.
+  - Sampling is cheaper, more deterministic, and easier to reason about.
+  - Dedicated video models could be explored later, but sampling stays the main path.
+- **Test evidence versioning and change detection**  
+  - Track evidence across signoff runs.
+  - Detect new, removed, or replaced screenshots.
+  - Call out improvements/regressions in the signoff comment.
+  - Makes re-runs more useful in iterative QA.
+- **Evidence quality and completeness metrics (non-blocking)**  
+  - Add informational metrics: AC coverage %, evidence per AC, basic clarity/resolution checks.
+  - Advisory only; no gating or confidence scoring.
+- **Design intent comparison (e.g. Figma)**  
+  - Optional, higher-level check against design intent instead of pixel diffs.
+  - Look for missing components, unexpected UI, and obvious layout/hierarchy issues.
+- **AI-suggested missing Acceptance Criteria and edge cases**  
+  - AI suggests missing ACs or edge-case tests.
+  - Advisory only; helps coverage without changing requirements.
