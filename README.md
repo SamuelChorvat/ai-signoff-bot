@@ -1,6 +1,5 @@
 # AI Signoff Bot 🤖
 
-[Jira link](https://acbot.atlassian.net?continue=https%3A%2F%2Facbot.atlassian.net%2Fwelcome%2Fsoftware&atlOrigin=eyJpIjoiYzZjMjZmZjM0MGU4NGI5Mzg5ZjExMDNmOTZkMzBhZmMiLCJwIjoiaiJ9) for the demo board
 
 AI Signoff Bot automates Jira signoff by evaluating acceptance criteria with a vision model, validating screenshot quality, and nudging issues through the workflow while keeping humans in control.
 
